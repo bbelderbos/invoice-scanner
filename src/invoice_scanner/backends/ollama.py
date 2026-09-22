@@ -13,13 +13,13 @@ _MAX_PAGES = 4
 
 def _pdf_to_png_b64(pdf: Path) -> list[str]:
     try:
-        import fitz  # PyMuPDF
+        import pymupdf
     except ImportError as e:
         raise RuntimeError(
             "ollama backend needs PyMuPDF: pip install 'invoice-scanner[ollama]'"
         ) from e
     images = []
-    with fitz.open(pdf) as doc:
+    with pymupdf.open(pdf) as doc:
         for page in doc[:_MAX_PAGES]:
             pix = page.get_pixmap(dpi=150)
             images.append(base64.b64encode(pix.tobytes("png")).decode())
