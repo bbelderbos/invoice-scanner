@@ -22,6 +22,27 @@ invoice-scan invoice.pdf --backend ollama --model llama3.2-vision
 invoice-scan invoice.pdf --categories software,hosting,office
 ```
 
+Example against a bundled sample:
+
+```bash
+$ invoice-scan samples/github_usd.pdf --backend claude
+{
+  "supplier": "GitHub, Inc.",
+  "supplier_tax_id": "",
+  "date": "2026-02-15",
+  "description": "GitHub Team subscription (1 month)",
+  "category": "Software subscription",
+  "currency": "USD",
+  "net_amount": "40.0",
+  "vat_rate": "0.0",
+  "payment_method": "card",
+  "confidence": 0.95,
+  "uncertain_fields": [
+    "supplier_tax_id"
+  ]
+}
+```
+
 The Ollama backend needs a running daemon and a **vision** model:
 
 ```bash
