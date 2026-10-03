@@ -44,6 +44,10 @@ $ invoice-scan samples/github_usd.pdf --backend claude
 
 ## Review (human in the loop)
 
+![invoice-scan --review demo](demo/review.gif)
+
+<sub>Recorded with [VHS](https://github.com/charmbracelet/vhs) from `demo/review.tape` against `samples/cowork_ambiguous.pdf`; the ~8s model call is cut.</sub>
+
 `--review` puts a human checkpoint between the model and your records. It shows every field with its confidence and source text, prompts only the fields below `--threshold` (default 0.8, least confident first), then lets you edit any other field before accepting. JSON is printed only on accept; `q` (or Ctrl-D) rejects with exit code 1 and no output. Prompts go to stderr, so `invoice-scan x.pdf --review > expense.json` works.
 
 ```bash

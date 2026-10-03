@@ -54,6 +54,23 @@ INVOICES = [
             "Paid via bank transfer.",
         ],
     },
+    {
+        "file": "cowork_ambiguous.pdf",
+        "lines": [
+            "Maple Desk Co-working",
+            "Toronto",
+            "",
+            "Receipt #551",
+            "03/04/26",
+            "",
+            "Hot desk day pass x2",
+            "Subtotal: $40.00",
+            "HST: $5.20",
+            "Total: $45.20",
+            "",
+            "Thanks for working with us!",
+        ],
+    },
 ]
 
 
