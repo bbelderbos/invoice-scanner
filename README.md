@@ -5,7 +5,7 @@ Extract structured expense data from invoice/receipt PDFs with an LLM — via a 
 - **`claude`** — shells out to `claude -p` (Claude Code), which reads the PDF with its Read tool. Zero API key wiring if you already use Claude Code.
 - **`ollama`** — sends rendered PDF pages to a **local** vision model. Nothing about your expenses leaves the machine.
 
-Amounts stay in the invoice's own currency (no FX conversion — that's the consumer's job). Every extraction carries a `confidence` score and a list of `uncertain_fields`, so a review step can flag the low-confidence ones before they hit a ledger.
+Amounts stay in the invoice's own currency (no FX conversion — that's the consumer's job). Every extraction carries an overall `confidence`, a per-field `field_confidence` and per-field `evidence` (the invoice text each value was read from), so a review step can flag the low-confidence ones before they hit a ledger.
 
 ## Install
 
@@ -37,11 +37,39 @@ $ invoice-scan samples/github_usd.pdf --backend claude
   "vat_rate": "0.0",
   "payment_method": "card",
   "confidence": 0.95,
-  "uncertain_fields": [
-    "supplier_tax_id"
-  ]
+  "field_confidence": {"supplier": 0.99, "supplier_tax_id": 0.4, "...": 0.99},
+  "evidence": {"supplier": "GitHub, Inc.", "supplier_tax_id": "", "...": "..."}
 }
 ```
+
+## Review (human in the loop)
+
+`--review` puts a human checkpoint between the model and your records. It shows every field with its confidence and source text, prompts only the fields below `--threshold` (default 0.8, least confident first), then lets you edit any other field before accepting. JSON is printed only on accept; `q` (or Ctrl-D) rejects with exit code 1 and no output. Prompts go to stderr, so `invoice-scan x.pdf --review > expense.json` works.
+
+```bash
+$ invoice-scan samples/hetzner_eur.pdf --review > expense.json
+  supplier         0.99  Hetzner Online GmbH   <- "Hetzner Online GmbH"
+  ...
+! category         0.65  Hosting
+  vat_rate         0.99  0.19   <- "VAT 19%: EUR 2.38"
+category [Hosting]: Cloud hosting
+Field to edit, Enter to accept, q to reject:
+```
+
+Every accepted review is appended to a corrections log (`~/.local/share/invoice-scanner/corrections.jsonl`, override with `--log`): extracted vs final values, which fields were flagged and which you edited. Ask it which fields need the most fixing:
+
+```bash
+$ invoice-scan --stats
+42 reviews, 11 with edits
+
+field            edits   rate  missed
+category             7    17%       2
+vat_rate             3     7%       3
+
+missed = edited although the model was confident (not flagged)
+```
+
+A high `missed` count means the model is overconfident on that field. Raise `--threshold` or improve the prompt for it.
 
 The Ollama backend needs a running daemon and a **vision** model:
 

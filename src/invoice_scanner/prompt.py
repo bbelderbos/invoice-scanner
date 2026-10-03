@@ -11,7 +11,10 @@ _FIELDS = (
     "vat_rate (decimal fraction e.g. 0.21 or 0.00), "
     "payment_method (card or transfer), "
     "confidence (number 0.0-1.0, your overall confidence in this extraction), "
-    "uncertain_fields (array of field names you are unsure about)"
+    "field_confidence (object mapping every field name above to your confidence 0.0-1.0 "
+    "in that value), "
+    "evidence (object mapping every field name above to the exact invoice text you read "
+    "it from, or empty string if inferred)"
 )
 
 
